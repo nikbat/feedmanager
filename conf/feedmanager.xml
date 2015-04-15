@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-4.0.xsd      
+	http://www.springframework.org/schema/task 
+	http://www.springframework.org/schema/task/spring-task-4.0.xsd">
+     
+     
+     <bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		scope="singleton">
+		<property name="location">
+			<value>file:///C:/workspace/feedmanager/conf/feedmanager.properties</value> 
+			<!-- value>file:///C:/code/McWorkspace/mcjobmanager/conf/mcjobmanager.properties</value -->
+			<!-- <value>conf/mcjobmanager.properties</value> -->
+		</property>
+	</bean>
+	
+	<!-- 
+	<bean id="feedManagerTimer" class="org.springframework.scheduling.timer.TimerFactoryBean">
+		<property name="scheduledTimerTasks">
+			<list>
+				<bean class="org.springframework.scheduling.timer.ScheduledTimerTask">
+					<property name="delay" value="3000" />
+					<property name="period" value="30000" />
+					<property name="runnable" ref="feedManager" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="mcJobManager" class="com.nick.feed.impl.FeedManager">
+	</bean>
+	
+   <task:scheduler id="connectorScheduler" pool-size="10"/>
+
+  <task:scheduled-tasks scheduler="connectorScheduler">
+    <task:scheduled ref="connector" method="checkConnection" fixed-rate="${connector.connectionAttemptDelayMillis}"/>
+  </task:scheduled-tasks>
+
+
+  <bean id="connector" class="com.test.Connector" scope="singleton">
+    <constructor-arg index="0" value="${connector.user}"/>
+    <constructor-arg index="1" value="${connector.password}"/>
+    <constructor-arg index="2" value="${connector.connectionAttemptDelayMillis}"/>
+  </bean>  	
+	-->
+	
+	<task:annotation-driven/>
+	
+	<bean id="feedManagerFixedDelay" class="com.nick.feed.impl.FeedManager" scope="singleton" destroy-method="destroy">
+		<constructor-arg ref="myTwitter" />
+		<constructor-arg ref="feedFetcherCache" />
+		<constructor-arg ref="tweetDB" />
+		<constructor-arg value="${nick.feeds}"/>
+		
+	</bean>
+	
+	<bean id="myTwitter" class="com.nick.MyTwitter" scope="singleton" destroy-method="destroy">		
+	</bean>
+	
+	<bean id="feedDB" class="com.nick.FeedDB" scope="singleton" destroy-method="close">		
+		<constructor-arg value="${nick.feedDB}"/>
+		<constructor-arg value="false"/>
+		
+	</bean>
+	
+	<bean id="tweetDB" class="com.nick.FeedDB" scope="singleton" destroy-method="close">		
+		<constructor-arg value="${nick.tweetDB}"/>
+		<constructor-arg value="false"/>
+		
+	</bean>
+	
+	<bean id="feedFetcherCache" class="com.nick.LocalDBFeedInfoCache" scope="singleton" destroy-method="close">		
+		<constructor-arg ref="feedDB" />
+		
+	</bean>
+
+	
+	
+	
+
+</beans>
